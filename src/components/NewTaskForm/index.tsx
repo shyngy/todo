@@ -23,7 +23,6 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
   onKeyUpInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const { taskLabel } = this.state;
     if (event.key === 'Enter' && taskLabel) {
-      if (taskLabel) return;
       const { onSaveTask } = this.props;
       onSaveTask({
         label: taskLabel,

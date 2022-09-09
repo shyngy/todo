@@ -42,10 +42,10 @@ const Task: React.FC<TaskProps> = ({ onChangeTask, onDeleteTask, ...task }) => {
             onChange={onChangeCheckbox}
             type="checkbox"
           />
-          <div>
+          <section>
             <span className="description">{task.label}</span>
             <span className="created">{task.createdAt}</span>
-          </div>
+          </section>
           <button
             aria-label="icon-edit"
             type="button"
