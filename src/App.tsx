@@ -13,10 +13,6 @@ import {
 } from './utils/types';
 import defaultValueTasks from './utils';
 
-const hello = '';
-
-console.log('hello');
-
 interface AppState {
   tasks: TaskData[];
   currentFilter: FilterStatusList;
