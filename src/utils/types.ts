@@ -3,6 +3,8 @@ export interface TaskData {
   status: 'editing' | 'active' | 'completed';
   createdAt: string;
   id: number;
+  time: number;
+  completedAt?: string;
 }
 
 export type FilterStatusList = 'all' | 'active' | 'completed';

@@ -15,10 +15,7 @@ const TaskList: React.FC<TaskListProps> = ({ onDeleteTask, tasks, onChangeTask }
         key={`${item.createdAt}${item.id}`}
         onDeleteTask={onDeleteTask}
         onChangeTask={onChangeTask}
-        id={item.id}
-        status={item.status}
-        createdAt={item.createdAt}
-        label={item.label}
+        task={item}
       />
     ))}
   </ul>
