@@ -81,14 +81,14 @@ class Task extends React.Component<TaskProps, TaskState> {
   render() {
     const { task } = this.props;
     const { label, time } = this.state;
-
+    const defaultLabel = label || task.label;
     return (
       <li className={task.status}>
         {task.status === 'editing' ? (
           <input
             onChange={(event) => this.setState({ label: event.target.value })}
             onKeyUp={this.inputKeyUp}
-            value={label}
+            value={defaultLabel}
             onBlur={this.onBlurInput}
             type="text"
             className="edit"

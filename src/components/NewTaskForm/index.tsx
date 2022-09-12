@@ -45,6 +45,8 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
         status: 'active',
         time,
       });
+
+      this.setState({ taskLabel: '' });
     }
   };
 
@@ -52,6 +54,7 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
     const { taskLabel } = this.state;
     return (
       <header className="header">
+        <h1>todos</h1>
         <form className="new-todo-form">
           <input
             value={taskLabel}
