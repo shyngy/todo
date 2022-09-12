@@ -8,8 +8,8 @@ interface NewTaskFromProps {
 
 interface NewTaskFromState {
   taskLabel: string;
-  min: number;
-  sec: number;
+  min: number | string;
+  sec: number | string;
 }
 
 class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
@@ -17,8 +17,8 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
     super(props);
     this.state = {
       taskLabel: '',
-      min: 0,
-      sec: 0,
+      min: '',
+      sec: '',
     };
   }
 
@@ -34,7 +34,7 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
 
   onKeyUpInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const { taskLabel, min, sec } = this.state;
-    const time = min * 60 + sec;
+    const time = (+min) * 60 + (+sec);
 
     const isTime = min || sec;
     if (event.key === 'Enter' && taskLabel && isTime) {
@@ -46,12 +46,12 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
         time,
       });
 
-      this.setState({ taskLabel: '' });
+      this.setState({ taskLabel: '', min: '', sec: '' });
     }
   };
 
   render() {
-    const { taskLabel } = this.state;
+    const { taskLabel, min, sec } = this.state;
     return (
       <header className="header">
         <h1>todos</h1>
@@ -66,6 +66,7 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
           />
           <input
             onChange={this.onChangeNumberInput}
+            value={min}
             name="min"
             max="60"
             min="0"
@@ -75,6 +76,7 @@ class NewTaskFrom extends React.Component<NewTaskFromProps, NewTaskFromState> {
           />
           <input
             onChange={this.onChangeNumberInput}
+            value={sec}
             name="sec"
             max="60"
             min="0"

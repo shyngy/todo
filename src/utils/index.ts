@@ -1,20 +1,20 @@
 const defaultValueTasks = [
   {
-    label: 'Completed task',
+    label: 'fw',
     status: 'active',
     createdAt: 'created 17 seconds ago',
     id: 0,
     time: 59,
   },
   {
-    label: 'editing task',
+    label: 'fw',
     status: 'active',
     createdAt: 'created 17 seconds ago',
     id: 1,
     time: 359,
   },
   {
-    label: 'Completed task',
+    label: 'fw',
     status: 'completed',
     createdAt: 'created 17 seconds ago',
     id: 2,
