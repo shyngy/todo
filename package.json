@@ -32,8 +32,9 @@
     }
   },
   "lint-staged": {
+    "src/**/*.{ts,tsx}": "prettier --config ./prettierrc.json --write .",
     "src/**/*.{ts,tsx}": "npm run lint:fix",
-    "src/*": "prettier --config ./prettierrc.json --write ."
+    "src/**/*.{ts,tsx}": "npm run lint"
   },
   "eslintConfig": {
     "extends": [
