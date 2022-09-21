@@ -1,134 +1,108 @@
 import React from 'react';
-import { OnChangeTask, OnDeleteTask, TaskData } from '../../utils/types';
-import { convertSeconds } from '../../utils';
+import {OnChangeTask, OnDeleteTask, TaskData} from '../../utils/types';
+import {convertSeconds} from '../../utils';
+
 
 interface TaskProps {
-  onDeleteTask: OnDeleteTask;
-  onChangeTask: OnChangeTask;
-  task: TaskData;
+    onDeleteTask: OnDeleteTask;
+    onChangeTask: OnChangeTask;
+    task: TaskData;
 }
 
-interface TaskState {
-  label: string;
-  isPlay: boolean;
-  time: number;
-}
-
-class Task extends React.Component<TaskProps, TaskState> {
-  completed: number;
-
-  constructor(props: TaskProps) {
-    super(props);
-    this.completed = 0;
-    this.state = {
-      label: '',
-      isPlay: false,
-      time: props.task.time,
+const Task: React.FC<TaskProps> = ({task, onDeleteTask, onChangeTask}) => {
+    let completed = 0
+    const [label, setLabel] = React.useState('')
+    const [timeData, setTimeData] = React.useState<[number, boolean]>([task.time, false])
+    const onPause = () => {
+        setTimeData((state) => [state[0], false]);
     };
-  }
 
-  onPause = () => {
-    this.setState({ isPlay: false });
-  };
+    const onPlay = () => {
+        if (timeData[1]) return
+        setTimeData((state) => [state[0], true]);
+        completed = new Date().getTime() + timeData[0] * 1000;
+        const interval = setInterval(() => {
+            setTimeData(([time, play]) => {
+                if (!play || time <= 0) clearInterval(interval);
+                const newTime = (completed - new Date().getTime()) / 1000;
+                return [Math.trunc(newTime), play]
+            })
 
-  onPlay = () => {
-    this.setState({ isPlay: true });
+        }, 200);
+    };
 
-    // eslint-disable-next-line react/destructuring-assignment
-    this.completed = new Date().getTime() + this.state.time * 1000;
+    const deleteTask = () => {
+        onDeleteTask(task.id);
+    };
 
-    const interval = setInterval(() => {
-      const { isPlay, time } = this.state;
-      if (!isPlay || time <= 0) {
-        clearInterval(interval);
-      }
-      const newTime = (this.completed - new Date().getTime()) / 1000;
-      this.setState({
-        time: Math.trunc(newTime),
-      });
-    }, 100);
-  };
+    const onBlurInput = () => {
+        onChangeTask(task.id, {...task, status: 'active'});
+    };
 
-  deleteTask = () => {
-    const { onDeleteTask, task } = this.props;
-    onDeleteTask(task.id);
-  };
+    const changeTask = () => {
 
-  onBlurInput = () => {
-    const { onChangeTask, task } = this.props;
-    onChangeTask(task.id, { ...task, status: 'active' });
-  };
+        onChangeTask(task.id, {...task, status: 'editing'});
+    };
 
-  changeTask = () => {
-    const { onChangeTask, task } = this.props;
-    onChangeTask(task.id, { ...task, status: 'editing' });
-  };
+    const inputKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter' && label) {
+            onChangeTask(task.id, {...task, status: 'active', label});
+        }
+    };
 
-  inputKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const { label } = this.state;
-    const { onChangeTask, task } = this.props;
-    if (event.key === 'Enter' && label) {
-      onChangeTask(task.id, { ...task, status: 'active', label });
-    }
-  };
+    const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const status = event.target.checked ? 'completed' : 'active';
+        onChangeTask(task.id, {...task, status});
+    };
 
-  onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { onChangeTask, task } = this.props;
-    const status = event.target.checked ? 'completed' : 'active';
-    onChangeTask(task.id, { ...task, status });
-  };
 
-  render() {
-    const { task } = this.props;
-    const { label, time } = this.state;
-    const defaultLabel = label || task.label;
     return (
-      <li className={task.status}>
-        {task.status === 'editing' ? (
-          <input
-            onChange={(event) => this.setState({ label: event.target.value })}
-            onKeyUp={this.inputKeyUp}
-            value={defaultLabel}
-            onBlur={this.onBlurInput}
-            type="text"
-            className="edit"
-            placeholder="Editing task"
-          />
-        ) : (
-          <div className="view">
-            <input
-              className="toggle"
-              checked={task.status === 'completed'}
-              onChange={this.onChangeCheckbox}
-              type="checkbox"
-            />
-            <section>
-              <span className="title">{task.label}</span>
-              <span className="description">
-                <button onClick={this.onPlay} type="button" className="icon icon-play" />
-                <button onClick={this.onPause} type="button" className="icon icon-pause" />
-                <span>{convertSeconds(time)}</span>
+        <li className={task.status}>
+            {task.status === 'editing' ? (
+                <input
+                    onChange={(event) => setLabel(event.target.value)}
+                    onKeyUp={inputKeyUp}
+                    value={label || task.label}
+                    onBlur={onBlurInput}
+                    type="text"
+                    className="edit"
+                    placeholder="Editing task"
+                />
+            ) : (
+                <div className="view">
+                    <input
+                        className="toggle"
+                        checked={task.status === 'completed'}
+                        onChange={onChangeCheckbox}
+                        type="checkbox"
+                    />
+                    <section>
+                        <span className="title">{task.label}</span>
+                        <span className="description">
+                <button onClick={onPlay} type="button" className="icon icon-play"/>
+                <button onClick={onPause} type="button" className="icon icon-pause"/>
+                <span>{convertSeconds(timeData[0])}</span>
               </span>
 
-              <span className="description">{task.createdAt}</span>
-            </section>
-            <button
-              aria-label="icon-edit"
-              type="button"
-              onClick={this.changeTask}
-              className="icon icon-edit"
-            />
-            <button
-              aria-label="icon-destroy"
-              type="button"
-              onClick={this.deleteTask}
-              className="icon icon-destroy"
-            />
-          </div>
-        )}
-      </li>
+                        <span className="description">{task.createdAt}</span>
+                    </section>
+                    <button
+                        aria-label="icon-edit"
+                        type="button"
+                        onClick={changeTask}
+                        className="icon icon-edit"
+                    />
+                    <button
+                        aria-label="icon-destroy"
+                        type="button"
+                        onClick={deleteTask}
+                        className="icon icon-destroy"
+                    />
+                </div>
+            )}
+        </li>
     );
-  }
+
 }
 
 export default Task;

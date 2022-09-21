@@ -4,91 +4,76 @@ import TaskList from './components/TaskList';
 import Footer from './components/Footer';
 import NewTaskForm from './components/NewTaskForm';
 import {
-  AddTask,
-  ChangeCurrentFilter,
-  FilterStatusList,
-  OnChangeTask,
-  OnDeleteTask,
-  TaskData,
+    AddTask,
+    ChangeCurrentFilter,
+    FilterStatusList,
+    OnChangeTask,
+    OnDeleteTask,
+    TaskData,
 } from './utils/types';
 import defaultValueTasks from './utils';
 
-interface AppState {
-  tasks: TaskData[];
-  currentFilter: FilterStatusList;
-}
+const App = () => {
+    const [tasks, setTasks] = React.useState<TaskData[]>(defaultValueTasks)
+    const [currentFilter, setCurrentFilter] = React.useState<FilterStatusList>('all')
 
-class App extends React.Component<unknown, AppState> {
-  constructor(props: unknown) {
-    super(props);
-    this.state = {
-      tasks: defaultValueTasks as TaskData[],
-      currentFilter: 'all',
+    const changeCurrentFilter: ChangeCurrentFilter = (status) => {
+        setCurrentFilter(status);
     };
-  }
 
-  changeCurrentFilter: ChangeCurrentFilter = (status) => {
-    this.setState({ currentFilter: status });
-  };
+    const clearCompleted = () => {
+        setTasks((state) => state.filter((item) => item.status !== 'completed'))
+    };
 
-  clearCompleted = () => {
-    this.setState((state) => ({
-      tasks: state.tasks.filter((item) => item.status !== 'completed'),
-    }));
-  };
+    const itemsLeft = () => {
+        return tasks.reduce((acc, item) => (item.status === 'active' ? acc + 1 : acc), 0);
+    };
 
-  itemsLeft = () => {
-    const { tasks } = this.state;
-    return tasks.reduce((acc, item) => (item.status === 'active' ? acc + 1 : acc), 0);
-  };
+    const addTask: AddTask = (task) => {
+        setTasks((state) => (
+            [{...task, id: state.length}, ...state]
+        ));
+    };
 
-  addTask: AddTask = (task) => {
-    this.setState((state) => ({
-      tasks: [{ ...task, id: state.tasks.length }, ...state.tasks],
-    }));
-  };
+    const onDeleteTask: OnDeleteTask = (id) => {
+        setTasks((state) =>
+            state.filter((item) => item.id !== id)
+        );
+    };
 
-  onDeleteTask: OnDeleteTask = (id) => {
-    this.setState((state) => ({
-      tasks: state.tasks.filter((item) => item.id !== id),
-    }));
-  };
+    const onChangeTask: OnChangeTask = (id, task) => {
+        setTasks(state =>
+            state.map((item) => (item.id === id ? task : item))
+        );
+    };
 
-  onChangeTask: OnChangeTask = (id, task) => {
-    this.setState((state) => ({
-      tasks: state.tasks.map((item) => (item.id === id ? task : item)),
-    }));
-  };
+    const currentTasks = () => {
+        if (currentFilter === 'all') return tasks;
+        return tasks.filter((item) => item.status === currentFilter);
+    };
 
-  currentTasks = () => {
-    const { currentFilter, tasks } = this.state;
-    if (currentFilter === 'all') return tasks;
-    return tasks.filter((item) => item.status === currentFilter);
-  };
 
-  render() {
-    const { currentFilter } = this.state;
     return (
-      <div className="App">
-        <section className="todoapp">
-          <NewTaskForm onSaveTask={this.addTask} />
-          <section className="main">
-            <TaskList
-              onChangeTask={this.onChangeTask}
-              onDeleteTask={this.onDeleteTask}
-              tasks={this.currentTasks()}
-            />
-            <Footer
-              clearCompleted={this.clearCompleted}
-              changeCurrentFilter={this.changeCurrentFilter}
-              currentFilter={currentFilter}
-              itemsLeft={this.itemsLeft()}
-            />
-          </section>
-        </section>
-      </div>
+        <div className="App">
+            <section className="todoapp">
+                <NewTaskForm onSaveTask={addTask}/>
+                <section className="main">
+                    <TaskList
+                        onChangeTask={onChangeTask}
+                        onDeleteTask={onDeleteTask}
+                        tasks={currentTasks()}
+                    />
+                    <Footer
+                        clearCompleted={clearCompleted}
+                        changeCurrentFilter={changeCurrentFilter}
+                        currentFilter={currentFilter}
+                        itemsLeft={itemsLeft()}
+                    />
+                </section>
+            </section>
+        </div>
     );
-  }
+
 }
 
 export default App;

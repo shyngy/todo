@@ -21,7 +21,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --config ./prettierrc.json --write .",
+    "format": "prettier --config ../untitled3/prettierrc.json --write .",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "prepare": "husky install"
